@@ -3,11 +3,8 @@ import logging
 import json
 import sys
 import re
-import os
 import binascii
 from Crypto.PublicKey import RSA
-from Crypto.Cipher import PKCS1_v1_5
-from Crypto.Signature import PKCS1_PSS
 
 from urllib.request import urlopen, Request
 
@@ -21,10 +18,8 @@ args = parser.parse_args().__dict__
 org = args['org']
 repo = args['repo']
 text = args['text']
+
 public_key = str
-
-pattern = re.compile('(?<=-----BEGIN PUBLIC KEY-----)([\s\S\n]*)(?=-----END PUBLIC KEY-----)')
-
 # Get public key from Travis
 url = 'https://api.travis-ci.org/repos/'+org+'/'+repo+'/key'
 logging.info('Querying ' + url)
@@ -40,12 +35,10 @@ with urlopen(request) as response:
         logging.warning(response.status)
         sys.exit()
 
-## Cipher
+# Cipher
 cipher = PKCS1_v1_5.new(public_key)
 
 # Encoded text encoded as UTF-8 (bytes) => ciphertext (bytes) => base 64 ciphertext (bytes) => string
 encrypted = binascii.b2a_base64(cipher.encrypt(text.encode())).decode()
-
-#encrypted = public_key.encrypt(text.encode(), map(ord, os.urandom(10)))
 
 print('- secure: ' + encrypted)
