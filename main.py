@@ -5,6 +5,7 @@ import sys
 import re
 import binascii
 from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
 
 from urllib.request import urlopen, Request
 
